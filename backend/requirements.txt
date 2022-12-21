@@ -1,0 +1,10 @@
+asyncpg
+click
+fastapi
+geoalchemy2
+loguru
+pandas
+pillow
+pydantic
+sqlalchemy
+uvicorn

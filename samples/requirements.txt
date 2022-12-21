@@ -1,0 +1,7 @@
+geopandas
+osm2geojson
+pandas
+psycopg2
+requests
+sqlalchemy
+tqdm

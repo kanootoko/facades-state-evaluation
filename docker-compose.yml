@@ -1,0 +1,16 @@
+version: "3.1"
+
+services:
+  facades_api:
+    container_name: facades_backend
+    build: ./backend
+    ports:
+      - $(FACADES_BACKEND_PORT):8080
+    envfile: ./app.env
+      
+  facades_db:
+    container_name: facades_db
+    image: postgres:14
+    volumes:
+      - ./pg_data:/var/lib/postgresql/data
+    envfile: ./db.env
