@@ -12,7 +12,7 @@ from facades_api.db.connection import get_connection
 from facades_api.logic import get_buildings, get_buildings_in_square
 from facades_api.schemas import GeoJSONResponse, crs_3857, crs_4326
 
-api_router = APIRouter(tags=["list_geojson"])
+api_router = APIRouter(tags=["Get buildings"])
 
 
 @api_router.get(

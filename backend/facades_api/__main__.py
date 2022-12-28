@@ -21,9 +21,9 @@ from facades_api.config import AppSettings
 from facades_api.config.app_settings_global import app_settings
 from facades_api.db.connection.session import SessionManager
 from facades_api.endpoints import list_of_routes
-from facades_api.utils import FacadesApiError
+from facades_api.utils.exceptions import FacadesApiError
 
-LAST_UPDATE = "2022-12-18"
+LAST_UPDATE = "2022-12-28"
 
 
 def bind_routes(application: FastAPI, prefix: str) -> None:

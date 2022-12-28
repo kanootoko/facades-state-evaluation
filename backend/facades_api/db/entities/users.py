@@ -40,7 +40,7 @@ users = UsersTable(
     Column("email", String(64), nullable=False),
     Column("name", String(30), nullable=False),
     Column("password_hash", CHAR(128), nullable=False),
-    Column("registered_at", TIMESTAMP(timezone=True), nullable=False, default=func.now()),
+    Column("registered_at", TIMESTAMP(timezone=True), nullable=False, server_default=func.now()),
     Column("is_active", Boolean, nullable=False, default=True),
     UniqueConstraint("email", name="users_unique_email"),
     UniqueConstraint("name", name="users_unique_name"),

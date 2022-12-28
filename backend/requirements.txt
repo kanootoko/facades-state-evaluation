@@ -6,5 +6,7 @@ loguru
 pandas
 pillow
 pydantic
+pyjwt
+python-multipart
 sqlalchemy
 uvicorn

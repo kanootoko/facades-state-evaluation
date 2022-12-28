@@ -41,7 +41,7 @@ marks = MarksTable(
     Column("photo_id", Integer, ForeignKey("photos.id"), nullable=False),
     Column("user_id", Integer, ForeignKey("users.id"), nullable=False),
     Column("parent_id", Integer, ForeignKey("marks.id")),
-    Column("added_at", TIMESTAMP(timezone=True), nullable=False, default=func.now()),
+    Column("added_at", TIMESTAMP(timezone=True), nullable=False, server_default=func.now()),
     Column("rating", Integer, nullable=False, default=0),
     Column("complaints", Integer, nullable=False, default=0),
     UniqueConstraint("photo_id", "user_id", "parent_id", name="marks_unique_photo_id_user_id"),

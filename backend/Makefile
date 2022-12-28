@@ -1,4 +1,4 @@
-VERSION = 0.1.0
+VERSION = 0.2.0
 
 lint:
 	pylint facades_api --max-line-length 120
@@ -10,7 +10,7 @@ debug:
 	python -m facades_api --debug
 
 docker-build:
-	docker build --tag kanootoko/facades_api:0.1.0 .
+	docker build --tag kanootoko/facades_api:$(VERSION) .
 
 docker-run:
 	docker run --env-file .env --rm --name facades_api

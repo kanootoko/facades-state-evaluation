@@ -8,8 +8,8 @@ from .enums import MFEnum, PTEnum
 from .mark_feedback import mark_feedback
 from .marks import marks
 from .photos import photos
-from .users_auth import users_auth
 from .users import users
+from .users_auth import users_auth
 
 __all__ = [
     "buildings",

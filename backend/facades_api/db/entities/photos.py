@@ -24,7 +24,7 @@ class PhotosTable(Table):
                 ("id", int),
                 ("user_id", int),
                 ("building_id", int),
-                ("type_id", int),
+                ("angle_type", int),
                 ("point", Geometry),
                 ("loaded_at", datetime),
             ],
@@ -41,7 +41,7 @@ photos = PhotosTable(
     Column("id", Integer, photos_id_seq, server_default=photos_id_seq.next_value(), primary_key=True),
     Column("user_id", Integer, ForeignKey("users.id", onupdate="CASCADE", ondelete="CASCADE"), nullable=False),
     Column("building_id", Integer, ForeignKey("buildings.id", onupdate="CASCADE", ondelete="CASCADE"), nullable=False),
-    Column("type_id", Enum(PTEnum), nullable=True),
+    Column("angle_type", Enum(PTEnum), nullable=True),
     Column("point", Geometry("POINT", srid=4326)),
     Column("loaded_at", TIMESTAMP(timezone=True)),
 )

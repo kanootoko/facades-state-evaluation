@@ -1,11 +1,13 @@
 # pylint: disable=too-many-ancestors, abstract-method
 """
 Users Authentication database table is defined here.
+
+It stores access tokens data
 """
 from datetime import datetime
 from typing import NamedTuple
 
-from sqlalchemy import TIMESTAMP, Boolean, Column, ForeignKey, Integer, Sequence, String, Table, func
+from sqlalchemy import TIMESTAMP, Boolean, Column, ForeignKey, Integer, Sequence, String, Table, UniqueConstraint
 
 from facades_api.db import metadata
 
@@ -23,7 +25,8 @@ class UsersAuthTable(Table):
                 ("user_id", int),
                 ("device", str),
                 ("is_active", bool),
-                ("last_update", datetime),
+                ("refresh_until", datetime),
+                ("valid_until", datetime),
             ],
         )
     }
@@ -39,5 +42,7 @@ users_auth = UsersAuthTable(
     Column("user_id", Integer, ForeignKey("users.id"), nullable=False),
     Column("device", String(200), nullable=False),
     Column("is_active", Boolean, nullable=False, default=True),
-    Column("last_update", TIMESTAMP(timezone=True), nullable=False, default=func.now()),
+    Column("refresh_until", TIMESTAMP(timezone=True), nullable=False),
+    Column("valid_until", TIMESTAMP(timezone=True), nullable=False),
+    UniqueConstraint("user_id", "device", name="users_auth_unique_user_id_device"),
 )

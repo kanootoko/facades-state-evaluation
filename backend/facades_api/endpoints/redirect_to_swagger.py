@@ -6,7 +6,7 @@ import fastapi
 from starlette import status
 
 
-api_router = APIRouter(tags=["system"])
+api_router = APIRouter(tags=["System"])
 
 
 @api_router.get(

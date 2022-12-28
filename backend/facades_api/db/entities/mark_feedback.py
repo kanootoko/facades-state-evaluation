@@ -39,6 +39,6 @@ mark_feedback = MarkFeedbackTable(
     Column("mark_id", Integer, ForeignKey("marks.id"), nullable=False),
     Column("user_id", Integer, ForeignKey("users.id"), nullable=False),
     Column("feedback", Enum(MFEnum), nullable=False),
-    Column("left_at", TIMESTAMP(timezone=True), nullable=False, default=func.now()),
+    Column("left_at", TIMESTAMP(timezone=True), nullable=False, server_default=func.now()),
     UniqueConstraint("mark_id", "user_id", name="mark_feedback_unique_mark_id_user_id"),
 )
