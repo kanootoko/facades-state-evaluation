@@ -23,7 +23,7 @@ from facades_api.db.connection.session import SessionManager
 from facades_api.endpoints import list_of_routes
 from facades_api.utils.exceptions import FacadesApiError
 
-LAST_UPDATE = "2022-12-28"
+LAST_UPDATE = "2023-01-13"
 
 
 def bind_routes(application: FastAPI, prefix: str) -> None:
@@ -43,8 +43,8 @@ def get_app(prefix: str = "/api") -> FastAPI:
     application = FastAPI(
         title="Facades evaluation service",
         description=description,
-        docs_url="/docs",
-        openapi_url="/openapi",
+        docs_url="/api/docs",
+        openapi_url="/api/openapi",
         version=f"{__version__} ({LAST_UPDATE})",
     )
     bind_routes(application, prefix)
@@ -290,10 +290,13 @@ if __name__ == "__main__":
     if os.path.isfile(".env"):
         with open(".env", "rt", encoding="utf-8") as f:
             for name, value in (
-                tuple((line[len("export ") :] if line.startswith("export ") else line).strip().split("="))
+                tuple((line[len("export ") :] if line.startswith("export ") else line).strip().split("=", 1))
                 for line in f.readlines()
-                if not line.startswith("#") and line != ""
+                if not line.startswith("#") and "=" in line
             ):
                 if name not in os.environ:
-                    os.environ[name] = value
+                    if " #" in value:
+                        value = value[: value.index(" #")]
+                    os.environ[name] = value.strip()
+                    print(name, "=", value)
     main()

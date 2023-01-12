@@ -1,16 +1,50 @@
 version: "3.1"
 
 services:
-  facades_api:
-    container_name: facades_backend
-    build: ./backend
-    ports:
-      - $(FACADES_BACKEND_PORT):8080
-    envfile: ./app.env
-      
   facades_db:
     container_name: facades_db
-    image: postgres:14
+    image: postgis/postgis:14-3.3
     volumes:
       - ./pg_data:/var/lib/postgresql/data
-    envfile: ./db.env
+    env_file: db.env
+
+  facades_backend:
+    container_name: facades_backend
+    build: ./backend
+    ports: # comment to hide backend by nginx
+      - ${BACKEND_EXPOSE_PORT}:8080
+    env_file: ./backend/.env
+    depends_on:
+      - facades_db
+
+  facades_nginx:
+    container_name: facades_nginx
+    build:
+      context: hosting
+      dockerfile: nginx.Dockerfile
+      args:
+        DOMAIN: ${DOMAIN}
+        BACKEND_ADDRESS: ${BACKEND_ADDRESS}
+    ports:
+      - ${HTTP_PORT}:80
+      - ${HTTPS_PORT}:443
+    env_file:
+      .env
+    volumes:
+      - ./hosting/config/ssl:/ssl
+    depends_on:
+      - facades_backend
+
+  facades_certificate_updater:
+    container_name: facades_certificate_updater
+    build:
+      context: hosting
+      dockerfile: certbot.Dockerfile
+      args:
+        EMAIL: ${EMAIL}
+        DOMAIN: ${DOMAIN}
+    volumes:
+      - ./hosting/config/ssl:/ssl
+      - ./hosting/config/letsencryptl:/etc/letsencrypt
+    depends_on:
+      - facades_nginx

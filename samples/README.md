@@ -19,3 +19,8 @@ This is a python script to download and save to file buildings from OSM for a gi
 
 This is a python script to read buildings geojson and insert its content to PostgreSQL database. Can be run without geopandas.  
 It uses up to 15 Gb of RAM to read and process data of Saint-Petersburg, for example.
+
+
+If you give a parameter to the insertion script, it will be treated as the output filename, sql inserts will be written there.  
+Then you can use it like `docker run --rm --network facades-state-evaluation_default -v "$PWD"/samples/insertion.sql:/insertion.sql -e PGPASSWORD=facades_api_password postgres:14 psql -h facades_db facades_db facades_api -f /insertion.sql >/dev/null`
+  to insert data in the database running inside Docker container.

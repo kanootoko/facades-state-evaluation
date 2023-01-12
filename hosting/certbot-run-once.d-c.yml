@@ -1,0 +1,14 @@
+version: '3.1'
+
+services:
+  certbot:
+    build:
+      context: .
+      dockerfile: certbot.Dockerfile
+      args:
+        EMAIL: ${EMAIL}
+        DOMAIN: ${DOMAIN}
+    volumes:
+      - ./config/ssl:/ssl
+      - ./config/letsencryptl:/etc/letsencrypt
+    command: ["/run_once"]

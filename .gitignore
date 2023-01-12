@@ -1,2 +1,5 @@
 *.bkp
 *.dtmp
+.env
+*.sql
+pg_data

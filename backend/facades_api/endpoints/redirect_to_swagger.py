@@ -19,4 +19,4 @@ api_router = APIRouter(tags=["System"])
 )
 async def redirect_to_swagger_docs():
     "Redirects to **/docs** from **/**"
-    return fastapi.responses.RedirectResponse("/docs", status_code=status.HTTP_307_TEMPORARY_REDIRECT)
+    return fastapi.responses.RedirectResponse("/api/docs", status_code=status.HTTP_307_TEMPORARY_REDIRECT)

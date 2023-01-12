@@ -1,4 +1,5 @@
 env:
-	cp backend/env.example ./app.env
-	cp backend/migrations/env.example
-	echo "Edit variables in .env-files as you need"
+	cp env.example .env
+	cp backend/.env.example backend/.env
+	cp hosting/.env.example hosting/.env
+	echo "Edit variables in .env-files (here, in backend and hosting) as you need"

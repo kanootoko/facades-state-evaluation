@@ -69,9 +69,9 @@ class AppSettings:
         """
         res = cls()
         for param, value in res.__dict__.items():
-            if f"APP_{param}" in os.environ:
-                logger.trace("Getting {} from envvar: {}", param, os.environ[f"APP_{param}"])
-                setattr(res, param, type(value)(os.environ[f"APP_{param}"]))
+            if (env := f"APP_{param}") in os.environ or (env := param.upper()) in os.environ:
+                logger.trace("Getting {} from envvar: {}", param, os.environ[env])
+                setattr(res, param, type(value)(os.environ[env]))
         return res
 
     def update(self, other: "AppSettings") -> None:
