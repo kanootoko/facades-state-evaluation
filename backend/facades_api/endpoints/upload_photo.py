@@ -9,7 +9,7 @@ from starlette import status
 from facades_api.db.connection import get_connection
 from facades_api.db.entities.enums import PTEnum
 from facades_api.dto import User as UserDTO
-from facades_api.logic import classify_deffects, save_classification_results, save_photo
+from facades_api.logic import classify_defects, save_classification_results, save_photo
 from facades_api.logic.exceptions import FileSizeError
 from facades_api.schemas import UploadPhotoResponse
 from facades_api.utils.dependencies import user_dependency
@@ -36,6 +36,6 @@ async def upload_photo(
     if not (600 << 10) <= len(photo) < (20 << 20):  # 600kb .. 20mb
         raise FileSizeError(len(photo))
     photo_id, photo_saved = await save_photo(conn, photo, user.id, building_id, angle_type)
-    classification_results = await classify_deffects(photo_saved)
+    classification_results = await classify_defects(photo_saved)
     mark_id = await save_classification_results(conn, photo_id, classification_results)
     return UploadPhotoResponse(photo_id=photo_id, classifier_mark_id=mark_id)

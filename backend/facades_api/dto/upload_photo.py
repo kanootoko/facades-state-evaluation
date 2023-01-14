@@ -9,7 +9,7 @@ from typing import Any
 @dataclass(frozen=True)
 class ClassificationResult:
     """
-    Contains deffect box, netural network confidence and deffect class name.
+    Contains defect box, netural network confidence and defect class name.
     """
 
     box: tuple[float, float, float, float]

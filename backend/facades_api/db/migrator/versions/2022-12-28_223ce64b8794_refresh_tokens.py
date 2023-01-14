@@ -13,14 +13,25 @@ Create Date: 2023-12-18 21:39:56.579133
 """
 import sqlalchemy as sa
 from alembic import op
+from sqlalchemy import Column, Integer, Sequence, String, Table, UniqueConstraint
 
-from facades_api.db.entities import deffect_types
+from facades_api.db import metadata
 
 # revision identifiers, used by Alembic.
 revision = "223ce64b8794"
 down_revision = "381c8c542364"
 branch_labels = None
 depends_on = None
+
+deffect_types_id_seq = Sequence("deffect_types_id_seq")
+
+deffect_types = Table(
+    "deffect_types",
+    metadata,
+    Column("id", Integer, deffect_types_id_seq, server_default=deffect_types_id_seq.next_value(), primary_key=True),
+    Column("name", String(40), nullable=False),
+    UniqueConstraint("name", name="deffect_types_unique_name"),
+)
 
 
 def upgrade():

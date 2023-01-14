@@ -245,7 +245,7 @@ def logger_from_str(logger_text: str) -> list[tuple[LogLevel, str]]:
     default="http://localhost:8081/classify",
     show_default=True,
     show_envvar=True,
-    help="Deffects classifier service api endpoint address",
+    help="Defects classifier service api endpoint address",
 )
 @click.option(
     "--debug",

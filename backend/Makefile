@@ -1,4 +1,4 @@
-VERSION = 0.3.0
+VERSION = 0.3.1
 
 lint:
 	pylint facades_api --max-line-length 120

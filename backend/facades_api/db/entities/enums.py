@@ -9,7 +9,7 @@ class PTEnum(Enum):
     Photo type enumeration
     """
 
-    DEFFECT = "DEFFECT"
+    DEFECT = "DEFECT"
     CLOSE_RANGE = "CLOSE_RANGE"
     MIDDLE_RANGE = "MIDDLE_RANGE"
     WIDE_RANGE = "WIDE_RANGE"

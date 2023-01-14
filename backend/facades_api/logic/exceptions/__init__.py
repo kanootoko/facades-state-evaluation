@@ -2,7 +2,7 @@
 Logic exceptions module.
 """
 from facades_api.logic.exceptions.buildings import TooManyBuildingsError
-from facades_api.logic.exceptions.deffects import DeffectsClassificationError
+from facades_api.logic.exceptions.defects import DefectsClassificationError
 from facades_api.logic.exceptions.files import FileSizeError
 from facades_api.logic.exceptions.users import (
     AccessTokenExpiredError,
@@ -17,7 +17,7 @@ from facades_api.logic.exceptions.users import (
 
 __all__ = [
     "TooManyBuildingsError",
-    "DeffectsClassificationError",
+    "DefectsClassificationError",
     "FileSizeError",
     "AccessTokenUsedToRefreshError",
     "AccessTokenExpiredError",

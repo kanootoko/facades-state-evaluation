@@ -5,13 +5,12 @@ Revises:
 Create Date: 2022-12-21 12:29:42.118244
 
 """
-from alembic import op
-import sqlalchemy as sa
 import geoalchemy2
+import sqlalchemy as sa
+from alembic import op
+from sqlalchemy import Sequence
 
 from facades_api.db.entities.buildings import buildings_id_seq
-from facades_api.db.entities.deffect_types import deffect_types_id_seq
-from facades_api.db.entities.deffects import deffects_id_seq
 from facades_api.db.entities.mark_feedback import mark_feedback_id_seq
 from facades_api.db.entities.marks import marks_id_seq
 from facades_api.db.entities.photos import photos_id_seq
@@ -23,6 +22,9 @@ revision = "381c8c542364"
 down_revision = None
 branch_labels = None
 depends_on = None
+
+deffect_types_id_seq = Sequence("deffect_types_id_seq")
+deffects_id_seq = Sequence("deffects_types_id_seq")
 
 
 def upgrade():

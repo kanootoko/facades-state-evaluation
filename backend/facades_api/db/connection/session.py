@@ -44,7 +44,6 @@ class SessionManager:
             app_settings.db_port,
             app_settings.db_name,
         )
-        logger.debug("SessionManager id = 0x{:x}", id(self))
         self.engine = create_async_engine(
             app_settings.database_uri,
             future=True,
