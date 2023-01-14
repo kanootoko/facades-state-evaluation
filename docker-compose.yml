@@ -7,6 +7,16 @@ services:
     volumes:
       - ./pg_data:/var/lib/postgresql/data
     env_file: db.env
+    restart: until-stopped
+
+  facades_classificator:
+    container_name: facades_classifier
+    build:
+      context: classifier
+    ports:
+      - ${CLASSIFIER_EXPOSE_PORT}:8081
+    env_file: ./classifier/.env
+    restart: until-stopped
 
   facades_backend:
     container_name: facades_backend
@@ -14,8 +24,14 @@ services:
     ports: # comment to hide backend by nginx
       - ${BACKEND_EXPOSE_PORT}:8080
     env_file: ./backend/.env
+    env:
+      - PHOTOS_DIRECTORY=/photos
+    volumes:
+      - ./photos:/photos
     depends_on:
       - facades_db
+      - facades_classifier
+    restart: until-stopped
 
   facades_nginx:
     container_name: facades_nginx
@@ -34,6 +50,7 @@ services:
       - ./hosting/config/ssl:/ssl
     depends_on:
       - facades_backend
+    restart: until-stopped
 
   facades_certificate_updater:
     container_name: facades_certificate_updater

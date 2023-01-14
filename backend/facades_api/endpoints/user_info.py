@@ -17,7 +17,7 @@ api_router = APIRouter(tags=["User data"])
     status_code=status.HTTP_200_OK,
     response_model=UserInfoResponse,
 )
-def user_info(user: UserDTO = Depends(user_dependency)):
+async def user_info(user: UserDTO = Depends(user_dependency)):
     """
     Return user information (email, name, registration time) when authorized.
     """

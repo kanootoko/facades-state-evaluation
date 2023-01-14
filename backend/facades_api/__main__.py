@@ -1,4 +1,4 @@
-# pylint: disable=too-many-arguments, no-value-for-parameter
+# pylint: disable=too-many-arguments, no-value-for-parameter, too-many-locals
 """
 Facades evaluation backend service startup module
 """
@@ -11,7 +11,6 @@ import typing as tp
 import click
 import uvicorn
 from fastapi import FastAPI, Request
-from fastapi.exception_handlers import http_exception_handler
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 from loguru import logger
@@ -21,9 +20,8 @@ from facades_api.config import AppSettings
 from facades_api.config.app_settings_global import app_settings
 from facades_api.db.connection.session import SessionManager
 from facades_api.endpoints import list_of_routes
-from facades_api.utils.exceptions import FacadesApiError
 
-LAST_UPDATE = "2023-01-13"
+LAST_UPDATE = "2023-01-14"
 
 
 def bind_routes(application: FastAPI, prefix: str) -> None:
@@ -73,16 +71,17 @@ async def internal_exception_handler(request: Request, exc: Exception) -> JSONRe
     If debug is activated in app configuration, then stack trace is returned, otherwise only a generic error message.
     Message is sent to logger error stream anyway.
     """
-    if isinstance(exc, FacadesApiError):
-        return await http_exception_handler(request, exc.get_http_exception(exc))
+    if len(error_message := repr(exc)) > 300:
+        error_message = f"{error_message[:300]}...({len(error_message) - 300} ommitted)"
     logger.opt(colors=True).error(
-        "<cyan>{} {}</cyan> - '<red>{}</red>': {!r}",
+        "<cyan>{} {}</cyan> - '<red>{}</red>': {}",
         (f"{request.client.host}:{request.client.port}" if request.client is not None else "<unknown user>"),
         request.method,
         exc,
-        exc,
+        error_message,
     )
-    logger.debug("{!r} Traceback:\n{}", exc, "".join(traceback.format_tb(exc.__traceback__)))
+
+    logger.debug("{} Traceback:\n{}", error_message, exc, "".join(traceback.format_tb(exc.__traceback__)))
     if app_settings.debug:
         return JSONResponse(
             {
@@ -128,7 +127,7 @@ def logger_from_str(logger_text: str) -> list[tuple[LogLevel, str]]:
     """
     res = []
     for item in logger_text.split(";"):
-        assert "," in item, f'logger text must be in format "LEVEL,filename" - current value is {logger_text}'
+        assert "," in item, f'logger text must be in format "LEVEL,filename" - current value is "{logger_text}"'
         level, filename = item.split(",", 1)
         level = level.upper()
         res.append((level, filename))  # type: ignore
@@ -193,6 +192,24 @@ def logger_from_str(logger_text: str) -> list[tuple[LogLevel, str]]:
     help="asyncpg database pool maximum size",
 )
 @click.option(
+    "--port",
+    "-p",
+    envvar="PORT",
+    type=int,
+    default=8080,
+    show_default=True,
+    show_envvar=True,
+    help="Service port number",
+)
+@click.option(
+    "--host",
+    envvar="HOST",
+    default="0.0.0.0",
+    show_default=True,
+    show_envvar=True,
+    help="Service HOST address (0.0.0.0 to accept requests from everywhere)",
+)
+@click.option(
     "--logger_verbosity",
     "-v",
     type=click.Choice(("TRACE", "DEBUG", "INFO", "WARNING", "ERROR")),
@@ -215,22 +232,20 @@ def logger_from_str(logger_text: str) -> list[tuple[LogLevel, str]]:
     help="Add logger in format LEVEL,path/to/logfile",
 )
 @click.option(
-    "--port",
-    "-p",
-    envvar="PORT",
-    type=int,
-    default=8080,
+    "--photos_directory",
+    envvar="PHOTOS_DIRECTORY",
+    default="./",
     show_default=True,
     show_envvar=True,
-    help="Service port number",
+    help="User photos storage directory (will be replaced with some sort of storage later)",
 )
 @click.option(
-    "--host",
-    envvar="HOST",
-    default="0.0.0.0",
+    "--classifier_endpoint",
+    envvar="CLASSIFIER_ENDPOINT",
+    default="http://localhost:8081/classify",
     show_default=True,
     show_envvar=True,
-    help="Service HOST address (0.0.0.0 to accept requests from everywhere)",
+    help="Deffects classifier service api endpoint address",
 )
 @click.option(
     "--debug",
@@ -249,6 +264,8 @@ def main(
     host: str,
     logger_verbosity: LogLevel,
     additional_loggers: list[tuple[LogLevel, str]],
+    photos_directory: str,
+    classifier_endpoint: str,
     debug: bool,
 ):
     """
@@ -265,6 +282,8 @@ def main(
         db_user=db_user,
         db_pass=db_pass,
         db_pool_size=db_pool_size,
+        photos_directory=photos_directory,
+        classifier_endpoint=classifier_endpoint,
         debug=debug,
     )
     app_settings.update(settings)
@@ -287,8 +306,9 @@ def main(
 
 
 if __name__ == "__main__":
-    if os.path.isfile(".env"):
-        with open(".env", "rt", encoding="utf-8") as f:
+    envfile = os.environ.get("ENVFILE", ".env")
+    if os.path.isfile(envfile):
+        with open(envfile, "rt", encoding="utf-8") as f:
             for name, value in (
                 tuple((line[len("export ") :] if line.startswith("export ") else line).strip().split("=", 1))
                 for line in f.readlines()
@@ -298,5 +318,4 @@ if __name__ == "__main__":
                     if " #" in value:
                         value = value[: value.index(" #")]
                     os.environ[name] = value.strip()
-                    print(name, "=", value)
     main()

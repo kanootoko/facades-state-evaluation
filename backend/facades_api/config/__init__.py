@@ -32,6 +32,8 @@ class AppSettings:
     )
     jwt_access_token_exp_time: int = 3 * 24 * 60 * 60  # in seconds = 3 days
     jwt_refresh_token_exp_time: int = 3 * 30 * 24 * 60 * 60  # in seconds = 3 months
+    photos_directory: str = "./photos"
+    classifier_endpoint: str = "http://localhost:8081/classify"
     application_name = f"facades_api ({api_version})"
 
     @property

@@ -10,6 +10,7 @@ class TooManyBuildingsError(FacadesApiError):
     """
     Exception of too big number of buildings returned after user request.
     """
+
     def __init__(self, buildings: int, maximum_buildings: int):
         super().__init__()
         self.buildings = buildings

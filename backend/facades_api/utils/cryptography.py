@@ -4,6 +4,7 @@ Cryptography functions are defined here.
 
 from hashlib import shake_128
 
+
 def hash_password(email: str, password: str) -> str:
     """
     Hash given password with email used as salt.

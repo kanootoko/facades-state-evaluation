@@ -8,7 +8,7 @@ import pandas as pd
 from geoalchemy2.functions import ST_AsGeoJSON
 from loguru import logger
 from numpy import nan
-from sqlalchemy import func
+from sqlalchemy import func, JSON
 from sqlalchemy.ext.asyncio import AsyncConnection
 from sqlalchemy.sql import select
 
@@ -42,7 +42,7 @@ async def get_buildings(
                 ST_AsGeoJSON(buildings.c.geometry)
                 if crs == crs_4326
                 else ST_AsGeoJSON(func.ST_TRANSFORM(buildings.c.geometry, crs.code))
-            ).label("geometry"),
+            ).cast(JSON).label("geometry"),
             subq.c.photos_count,
         )
         .select_from(buildings)

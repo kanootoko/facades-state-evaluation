@@ -1,20 +1,22 @@
 # pylint: disable=missing-module-docstring, no-name-in-module, too-few-public-methods
 """
-Geojson response model and its inner parts are defined here.
+Alternative geojson response model and its inner parts are defined here.
+It is a bit faster to initaliza `dataclass`es instead of a `pydantic` ones, but still too long for >40k features in GeoJSON.
 """
 import json
 import typing as tp
 from typing import Any, Iterable
+from dataclasses import dataclass, field
 
 import pandas as pd
 from loguru import logger
-from pydantic import BaseModel
 from sqlalchemy.engine.row import Row
 
 
-class Crs(BaseModel):
+@dataclass
+class Crs:
     """
-    Projection SRID / CRS representation for GeoJSON model.
+    Projection SRID / CRS representation for GeoJSON model as a dataclass.
     """
 
     type: str
@@ -33,27 +35,29 @@ class Crs(BaseModel):
             raise ValueError(f"something wrong with crs name: '{name}'") from exc
 
 
-crs_4326 = Crs(type="name", properties={"name": "urn:ogc:def:crs:EPSG:4326"})
-crs_3857 = Crs(type="name", properties={"name": "urn:ogc:def:crs:EPSG:3857"})
+crs_4326 = Crs("name", {"name": "urn:ogc:def:crs:EPSG:4326"})
+crs_3857 = Crs("name", {"name": "urn:ogc:def:crs:EPSG:3857"})
 
 
-class Geometry(BaseModel):
+@dataclass(frozen=True)
+class Geometry:
     """
-    Geometry representation for GeoJSON model.
+    Geometry representation for GeoJSON model as a dataclass.
     """
 
     type: tp.Literal["Point", "Polygon", "MultiPolygon", "LineString"]
     coordinates: list[tp.Any]
 
 
-class Feature(BaseModel):
+@dataclass
+class Feature:
     """
-    Feature representation for GeoJSON model.
+    Feature representation for GeoJSON model as a dataclass.
     """
 
-    type: tp.Literal["Feature"] = "Feature"
     geometry: Geometry
-    properties: dict[str, tp.Any] = {}
+    properties: dict[str, tp.Any] = field(default_factory=dict)
+    type: tp.Literal["Feature"] = "Feature"
 
     @classmethod
     def from_series(cls, series: pd.Series, geometry_column: str = "geometry", include_nulls: bool = True) -> "Feature":
@@ -67,7 +71,7 @@ class Feature(BaseModel):
         del properties[geometry_column]
         if isinstance(geometry, str):
             geometry = json.loads(geometry)
-        return cls(geometry=geometry, properties=properties)
+        return cls(geometry, properties)
 
     @classmethod
     def from_dict(
@@ -83,7 +87,7 @@ class Feature(BaseModel):
         del properties[geometry_column]
         if isinstance(geometry, str):
             geometry = json.loads(geometry)
-        return cls(geometry=geometry, properties=properties)
+        return cls(geometry, properties)
 
     @classmethod
     def from_row(cls, row: dict[str, Any], geometry_column: str = "geometry", include_nulls: bool = True) -> "Feature":
@@ -99,17 +103,18 @@ class Feature(BaseModel):
         else:
             properties = {name: row[name] for name in row.keys() if name != geometry_column and row[name] is not None}
 
-        return cls(geometry=geometry, properties=properties)
+        return cls(geometry, properties)
 
 
-class GeoJSONResponse(BaseModel):
+@dataclass
+class GeoJSONResponse:
     """
     GeoJSON model representation.
     """
 
     crs: Crs
-    type: tp.Literal["FeatureCollection"] = "FeatureCollection"
     features: list[Feature]
+    type: tp.Literal["FeatureCollection"] = "FeatureCollection"
 
     @classmethod
     async def from_df(
@@ -119,8 +124,7 @@ class GeoJSONResponse(BaseModel):
         Construct GeoJSON model from pandas DataFrame with one column containing GeoJSON geometries.
         """
         return cls(
-            crs=crs,
-            features=list(data_df.apply(lambda row: Feature.from_series(row, geometry_column, include_nulls), axis=1)),
+            crs, list(data_df.apply(lambda row: Feature.from_series(row, geometry_column, include_nulls), axis=1))
         )
 
     @classmethod
@@ -137,9 +141,7 @@ class GeoJSONResponse(BaseModel):
         """
 
         func = Feature.from_row if isinstance(next(iter(features), None), Row) else Feature.from_dict
-        features = [
-            func(feature, geometry_field, include_nulls) for feature in features
-        ]  # TODO: move it to another process to increase performance
+        features = [func(feature, geometry_field, include_nulls) for feature in features]
         return cls(
             crs=crs,
             features=features,

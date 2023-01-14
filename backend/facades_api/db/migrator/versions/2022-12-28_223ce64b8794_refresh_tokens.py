@@ -8,7 +8,7 @@ Add index to users table: email
 
 Revision ID: 223ce64b8794
 Revises: 381c8c542364
-Create Date: 2023-01-13 21:39:56.579133
+Create Date: 2023-12-18 21:39:56.579133
 
 """
 import sqlalchemy as sa

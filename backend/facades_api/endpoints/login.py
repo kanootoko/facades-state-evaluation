@@ -32,7 +32,6 @@ async def authorize_user(
     If the given device value was already set for other token of a given user, then old token is overwrited.
     """
     tokens = await authorize(conn, device, form_data.username, form_data.password)
-    print(tokens)
     return LoginResponse(access_token=tokens.access, refresh_token=tokens.refresh)
 
 

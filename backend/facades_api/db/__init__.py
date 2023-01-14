@@ -5,9 +5,7 @@ from sqlalchemy import MetaData
 from sqlalchemy.orm import declarative_base
 
 convention = {
-    "all_column_names": lambda constraint, _: "_".join(
-        [str(column.name) for column in constraint.columns.values()]
-    ),
+    "all_column_names": lambda constraint, _: "_".join([str(column.name) for column in constraint.columns.values()]),
     "ix": "%(table_name)s_index_%(all_column_names)s",
     "uq": "%(table_name)s_unique_%(all_column_names)s",
     "ck": "%(table_name)s_check_%(constraint_name)s",

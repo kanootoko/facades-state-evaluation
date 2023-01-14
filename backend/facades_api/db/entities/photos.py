@@ -6,7 +6,7 @@ from datetime import datetime
 from typing import NamedTuple
 
 from geoalchemy2 import Geometry
-from sqlalchemy import TIMESTAMP, Column, Enum, ForeignKey, Integer, Sequence, Table
+from sqlalchemy import TIMESTAMP, Column, Enum, ForeignKey, Integer, Sequence, Table, func
 
 from facades_api.db import metadata
 from facades_api.db.entities.enums import PTEnum
@@ -41,7 +41,7 @@ photos = PhotosTable(
     Column("id", Integer, photos_id_seq, server_default=photos_id_seq.next_value(), primary_key=True),
     Column("user_id", Integer, ForeignKey("users.id", onupdate="CASCADE", ondelete="CASCADE"), nullable=False),
     Column("building_id", Integer, ForeignKey("buildings.id", onupdate="CASCADE", ondelete="CASCADE"), nullable=False),
-    Column("angle_type", Enum(PTEnum), nullable=True),
+    Column("angle_type", Enum(PTEnum)),
     Column("point", Geometry("POINT", srid=4326)),
-    Column("loaded_at", TIMESTAMP(timezone=True)),
+    Column("loaded_at", TIMESTAMP(timezone=True), server_default=func.now()),
 )

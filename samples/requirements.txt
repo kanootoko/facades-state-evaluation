@@ -1,4 +1,5 @@
 geopandas
+numpy
 osm2geojson
 pandas
 psycopg2
