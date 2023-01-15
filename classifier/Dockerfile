@@ -4,6 +4,8 @@ ARG WEIGHTS_FILENAME=*.weights
 ARG CFG_FILENAME=*.cfg
 ARG CLASSES_FILENAME=classes.txt
 
+RUN apt update && apt install -y libgl-dev libglib2.0-0
+
 RUN mkdir /app
 
 COPY requirements.txt /app/

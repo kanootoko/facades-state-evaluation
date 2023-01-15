@@ -50,7 +50,6 @@ def get_evaluation_value_raw(building_defects: list[PTEnum, int, int, str]) -> f
     count = defaultdict(lambda: 0)
     for _angle_type, _width, _height, defect_type in building_defects:
         count[defect_type] += 1
-    print(count)
     evaluation_value -= count["bricks"] * 1.0
     evaluation_value -= min(count["wall_damage"] * 0.5, 6)
     evaluation_value -= min(count["crack"] * 0.5, 4)
