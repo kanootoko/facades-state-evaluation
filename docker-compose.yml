@@ -21,8 +21,6 @@ services:
   facades_backend:
     container_name: facades_backend
     build: ./backend
-    ports: # comment to hide backend by nginx
-      - ${BACKEND_EXPOSE_PORT}:8080
     env_file: ./backend/.env
     env:
       - PHOTOS_DIRECTORY=/photos

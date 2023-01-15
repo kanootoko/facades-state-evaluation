@@ -9,8 +9,8 @@ from alembic import op
 import sqlalchemy as sa
 
 # revision identifiers, used by Alembic.
-revision = '08e81fde0f66'
-down_revision = 'd8a0067c3f5f'
+revision = "08e81fde0f66"
+down_revision = "d8a0067c3f5f"
 branch_labels = None
 depends_on = None
 
@@ -26,7 +26,9 @@ def upgrade():
     op.execute("ALTER SEQUENCE deffects_id_seq RENAME TO defects_id_seq")
     op.execute("ALTER TABLE defects RENAME CONSTRAINT deffects_fk_author_id__users TO defects_fk_author_id__users")
     op.execute("ALTER TABLE defects RENAME CONSTRAINT deffects_fk_mark_id__marks TO defects_fk_mark_id__marks")
-    op.execute("ALTER TABLE defects RENAME CONSTRAINT deffects_fk_type_id__deffect_types TO defects_fk_type_id__deffect_types")
+    op.execute(
+        "ALTER TABLE defects RENAME CONSTRAINT deffects_fk_type_id__deffect_types TO defects_fk_type_id__deffect_types"
+    )
 
 
 def downgrade():
@@ -40,4 +42,6 @@ def downgrade():
     op.execute("ALTER SEQUENCE defects_id_seq RENAME TO deffects_id_seq")
     op.execute("ALTER TABLE deffects RENAME CONSTRAINT defects_fk_author_id__users TO deffects_fk_author_id__users")
     op.execute("ALTER TABLE deffects RENAME CONSTRAINT defects_fk_mark_id__marks TO deffects_fk_mark_id__marks")
-    op.execute("ALTER TABLE deffects RENAME CONSTRAINT defects_fk_type_id__deffect_types TO deffects_fk_type_id__deffect_types")
+    op.execute(
+        "ALTER TABLE deffects RENAME CONSTRAINT defects_fk_type_id__deffect_types TO deffects_fk_type_id__deffect_types"
+    )

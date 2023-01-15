@@ -1,17 +1,25 @@
+# pylint: disable=too-many-locals, broad-except, no-member, unexpected-keyword-arg, bare-except, invalid-name, abstract-method, no-value-for-parameter, too-many-arguments, global-variable-undefined
+"""
+Classifier service. Requires trained model to run.
+"""
 import os
+import platform
 import uuid
 from dataclasses import dataclass
 from io import BytesIO
 
 import click
 import cv2
-import uvicorn
 from flask import Flask, jsonify, make_response, request
 from numpy import argmax
 
 
 @dataclass(frozen=True)
 class Result:
+    """
+    Classification result class.
+    """
+
     box: tuple[float, float, float, float]
     confidence: float
     class_name: str
@@ -22,6 +30,9 @@ app = Flask("classifier")
 
 @app.post("/classify")
 def classify():
+    """
+    Classify image given in request body for defects.
+    """
     img_data = BytesIO(request.get_data())
 
     path = str(uuid.uuid4())
@@ -39,11 +50,11 @@ def classify():
 
     blob = cv2.dnn.blobFromImage(img, 1 / 255, (image_size[0], image_size[1]), (0, 0, 0), swapRB=True, crop=False)
     net.setInput(blob)
-    layerOutputs = net.forward(net.getUnconnectedOutLayersNames())
+    layer_outputs = net.forward(net.getUnconnectedOutLayersNames())
 
     results: list[Result] = []
 
-    for output in layerOutputs:
+    for output in layer_outputs:
         for detection in output:
             scores = detection[5:]
             class_id = int(argmax(scores))
@@ -59,18 +70,47 @@ def classify():
 
                 results.append(Result((x, y, w, h), confidence, classes[class_id]))
 
-    return make_response(jsonify({"deffects": results}))
+    return make_response(jsonify({"defects": results}))
 
 
 @app.get("/")
 def basic_help():
+    """
+    Return small help message on opening root page.
+    """
     return make_response(
         jsonify(
             {
-                "help": "Send image in body parameter to /classify endpoint to get the results of its deffects classification"
+                "help": "Send image in body parameter to /classify endpoint"
+                " to get the results of its defects classification"
             }
         )
     )
+
+
+if platform.uname().system.lower() == "linux":
+    print("Detected Linux, Preparing gunicorn")
+    import gunicorn.app.base
+
+    class StandaloneApplication(gunicorn.app.base.BaseApplication):
+        """
+        WSGI application wrapper.
+        """
+
+        def __init__(self, application, options: dict | None = None):
+            self.options = options if options is not None else {}
+            self.application = application
+            super().__init__()
+
+        def load_config(self):
+            config = {
+                key: value for key, value in self.options.items() if key in self.cfg.settings and value is not None
+            }
+            for key, cfg_value in config.items():
+                self.cfg.set(key.lower(), cfg_value)
+
+        def load(self):
+            return self.application
 
 
 @click.command("classifier")
@@ -155,14 +195,26 @@ def main(
     image_height: int,
     debug: bool,
 ):
+    """
+    CLI runner for classifier service.
+    """
     global net
     global classes
     global image_size
     net = cv2.dnn.readNet(weights_filename, cfg_filename)
-    with open(classes_filename, "r") as f:
-        classes = f.read().splitlines()
+    with open(classes_filename, "r", encoding="utf-8") as file:
+        classes = file.read().splitlines()
     image_size = (image_width, image_height)
-    uvicorn.run(app, host=host, port=port, debug=debug)
+    if platform.uname().system.lower() == "linux":
+        options = {
+            "bind": f"{host}:{port}",
+            "workers": 1,
+            "timeout": 120,
+            "debug": debug,
+        }
+        StandaloneApplication(app, options).run()
+    else:
+        app.run(host=host, port=port, debug=debug)
 
 
 if __name__ == "__main__":

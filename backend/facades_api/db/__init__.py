@@ -9,7 +9,7 @@ convention = {
     "ix": "%(table_name)s_index_%(all_column_names)s",
     "uq": "%(table_name)s_unique_%(all_column_names)s",
     "ck": "%(table_name)s_check_%(constraint_name)s",
-    "fk": ("%(table_name)s_fk_%(all_column_names)s__" "%(referred_table_name)s"),
+    "fk": "%(table_name)s_fk_%(all_column_names)s__%(referred_table_name)s",
     "pk": "%(table_name)s_pk",
 }
 

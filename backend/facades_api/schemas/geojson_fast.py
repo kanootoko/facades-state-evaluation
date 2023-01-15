@@ -1,7 +1,9 @@
-# pylint: disable=missing-module-docstring, no-name-in-module, too-few-public-methods
+# pylint: disable=missing-module-docstring, no-name-in-module, too-few-public-methods, duplicate-code
 """
 Alternative geojson response model and its inner parts are defined here.
-It is a bit faster to initaliza `dataclass`es instead of a `pydantic` ones, but still too long for >40k features in GeoJSON.
+
+It is a bit faster to initaliza `dataclass`es instead of a `pydantic` ones,
+    but still too long for >40k features in GeoJSON.
 """
 import json
 import typing as tp

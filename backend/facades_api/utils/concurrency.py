@@ -10,10 +10,16 @@ import more_itertools
 
 
 def inner_looping_function(function: Callable, params: Iterable[Any]) -> list[Any]:
+    """
+    Experimental function to run in other worker.
+    """
     return [function(*p) for p in params]
 
 
 async def map_in_process_pool_chunked(function: Callable, params: Iterable[Any], chunk_size: int = 1) -> list[Any]:
+    """
+    Experimental function to map given function on params in workers divided by chunks.
+    """
     loop = asyncio.get_event_loop()
     with concurrent.futures.ProcessPoolExecutor() as pool:
         futures = (
@@ -24,6 +30,9 @@ async def map_in_process_pool_chunked(function: Callable, params: Iterable[Any],
 
 
 async def map_in_process_pool(function: Callable, params: Iterable[Any]) -> list[Any]:
+    """
+    Experimental function to map given function on params in another worker.
+    """
     loop = asyncio.get_event_loop()
     with concurrent.futures.ProcessPoolExecutor() as pool:
         futures = [loop.run_in_executor(pool, function, *p) for p in params]

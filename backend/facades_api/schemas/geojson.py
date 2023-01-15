@@ -1,4 +1,4 @@
-# pylint: disable=missing-module-docstring, no-name-in-module, too-few-public-methods
+# pylint: disable=missing-module-docstring, no-name-in-module, too-few-public-methods, duplicate-code
 """
 Geojson response model and its inner parts are defined here.
 """

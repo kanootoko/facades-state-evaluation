@@ -1,4 +1,4 @@
-VERSION = 0.3.1
+VERSION = 0.4.0
 
 lint:
 	pylint facades_api --max-line-length 120
@@ -23,3 +23,9 @@ docker-update-latest:
 	docker push kanootoko/facades_api:latest
 
 docker-pipeline: docker-build docker-push docker-update-latest
+
+db-revision:
+	cd facades_api/db && alembic revision --autogenerate
+
+db-migrate:
+	cd facades_api/db && alembic upgrade head

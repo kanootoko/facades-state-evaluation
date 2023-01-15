@@ -5,7 +5,7 @@ Buildings database table is defined here.
 from typing import NamedTuple
 
 from geoalchemy2 import Geometry
-from sqlalchemy import Column, Integer, Sequence, String, Table, UniqueConstraint, Numeric, text
+from sqlalchemy import Column, Integer, Sequence, String, Table, UniqueConstraint, Numeric, text, Float
 
 from facades_api.db import metadata
 
@@ -39,6 +39,7 @@ buildings = BuildingsTable(
     Column("address", String(256)),
     Column("building_year", Integer),
     Column("geometry", Geometry(srid=4326), nullable=False),
-    Column("evaluation", Numeric(4, 3), server_default=text("null")),
+    Column("evaluation", Numeric(5, 3), server_default=text("null")),
+    Column("evaluation_raw", Float, server_default=text("null")),
     UniqueConstraint("osm_id", name="buildings_unique_osm_id"),
 )

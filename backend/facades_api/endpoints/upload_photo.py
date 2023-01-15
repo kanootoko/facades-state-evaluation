@@ -2,17 +2,23 @@
 """
 Photo upload endpoint is defined here.
 """
-from fastapi import APIRouter, Depends, File, Form, UploadFile
+import io
+
+from fastapi import APIRouter, Depends, File, Form, Response, UploadFile
+from loguru import logger
+from PIL import Image
 from sqlalchemy.ext.asyncio import AsyncConnection
 from starlette import status
 
 from facades_api.db.connection import get_connection
 from facades_api.db.entities.enums import PTEnum
 from facades_api.dto import User as UserDTO
-from facades_api.logic import classify_defects, save_classification_results, save_photo
+from facades_api.logic import classify_defects, save_classification_results, save_photo, update_evaluation_value
 from facades_api.logic.exceptions import FileSizeError
 from facades_api.schemas import UploadPhotoResponse
+from facades_api.utils import draw_defects
 from facades_api.utils.dependencies import user_dependency
+from facades_api.logic.evaluation import get_evaluation_value_raw
 
 api_router = APIRouter(tags=["Photos"])
 
@@ -38,4 +44,38 @@ async def upload_photo(
     photo_id, photo_saved = await save_photo(conn, photo, user.id, building_id, angle_type)
     classification_results = await classify_defects(photo_saved)
     mark_id = await save_classification_results(conn, photo_id, classification_results)
+    await update_evaluation_value(conn, building_id)
     return UploadPhotoResponse(photo_id=photo_id, classifier_mark_id=mark_id)
+
+
+@api_router.post(
+    "/photo/classify",
+    status_code=status.HTTP_200_OK,
+    responses={status.HTTP_200_OK: {"content": {"image/jpg": {}}}},
+)
+async def classify_photo(angle_type: PTEnum, photo_file: UploadFile = File(...)):
+    """
+    Pass given photo directly to the classifier service and get an image with marked defects.
+    """
+    logger.debug("classification request")
+    photo = await photo_file.read(20 << 20)
+    if not (600 << 10) <= len(photo) < (20 << 20):  # 600kb .. 20mb
+        raise FileSizeError(len(photo))
+    classification_results = await classify_defects(photo)
+    logger.debug("classified {} defects", len(classification_results))
+    buf = io.BytesIO(photo)
+    image = draw_defects(Image.open(buf), classification_results)
+    imgage_byte_arr = io.BytesIO()
+    image.save(imgage_byte_arr, format="jpeg")
+    evaluation_raw = get_evaluation_value_raw(
+        [(angle_type, d.box[0], d.box[1], d.class_name) for d in classification_results]
+    )
+    return Response(
+        content=imgage_byte_arr.getvalue(),
+        media_type="image/jpg",
+        headers={
+            "X-Defects-count": str(len(classification_results)),
+            "X-Evaluation_value_raw": str(evaluation_raw),
+            "X-evaluation_value": str(min(max(evaluation_raw, 0.0), 10.0)),
+        },
+    )

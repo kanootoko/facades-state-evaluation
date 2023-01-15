@@ -24,7 +24,8 @@ def upgrade():
         sa.Column("evaluation", sa.Numeric(precision=4, scale=3), nullable=True, server_default=sa.text("null")),
     )
     op.execute(
-        "INSERT INTO users (id, name, email, password_hash, registered_at, is_active) VALUES (0, 'robot', 'robot@ai.com', 'no_hash_no_login', '2022-12-21 12:30', 'true')"
+        "INSERT INTO users (id, name, email, password_hash, registered_at, is_active) VALUES (0, 'robot',"
+        " 'robot@ai.com', 'no_hash_no_login', '2022-12-21 12:30', 'true')"
     )
 
 

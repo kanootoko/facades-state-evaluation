@@ -61,8 +61,8 @@ async def save_classification_results(
             author_id=0,
             x=result.box[0],
             y=result.box[1],
-            width=result.box[2] - result.box[0],
-            height=result.box[3] - result.box[1],
+            width=result.box[2],
+            height=result.box[3],
             type_id=d_t[result.class_name],
         )
         await conn.execute(statement)
