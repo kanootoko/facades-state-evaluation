@@ -5,7 +5,7 @@ from enum import Enum
 
 
 class PTEnum(Enum):
-    """\
+    """
     Photo type enumeration
     """
 

@@ -29,7 +29,7 @@ async def get_buildings(
     Return database buildings as a dataframe.
     """
     subq = (
-        select(photos.c.building_id, func.count(photos.c.id).label("photos_count"))
+        select(photos.c.building_id, func.count(photos.c.id).label("photos_count"))  # pylint: disable=not-callable
         .group_by(photos.c.building_id)
         .subquery("pc")
     )
@@ -55,7 +55,7 @@ async def get_buildings(
     data = await conn.execute(statement)
     if as_dataframe:
         return pd.DataFrame(data).replace({nan: None})
-    return list(data)
+    return list(data.mappings())
 
 
 async def get_buildings_in_square(
@@ -72,7 +72,7 @@ async def get_buildings_in_square(
     geometry_square = select(func.ST_SetSRID(func.ST_MakeEnvelope(x[0], y[0], x[1], y[1]), 4326).label("geometry")).cte(
         "geometry_square"
     )
-    statement = select(func.count(buildings.c.id).label("count")).where(
+    statement = select(func.count(buildings.c.id).label("count")).where(  # pylint: disable=not-callable
         func.ST_Intersects(buildings.c.geometry, select(geometry_square.c.geometry))
     )
     logger.debug("Statement: {}", statement)
@@ -80,7 +80,7 @@ async def get_buildings_in_square(
     if buildings_count > MAX_BUILDINGS_RETURNED_PER_SCREEN:
         raise TooManyBuildingsError(buildings_count, MAX_BUILDINGS_RETURNED_PER_SCREEN)
     subq = (
-        select(photos.c.building_id, func.count(photos.c.id).label("photos_count"))
+        select(photos.c.building_id, func.count(photos.c.id).label("photos_count"))  # pylint: disable=not-callable
         .group_by(photos.c.building_id)
         .subquery("pc")
     )
@@ -103,4 +103,4 @@ async def get_buildings_in_square(
     data = await conn.execute(statement)
     if as_dataframe:
         return pd.DataFrame(data).replace({nan: None})
-    return list(data)
+    return list(data.mappings())

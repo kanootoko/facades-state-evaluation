@@ -2,47 +2,36 @@
 """
 Marks database table is defined here.
 """
-from datetime import datetime
-from typing import NamedTuple
-
 from sqlalchemy import TIMESTAMP, Column, ForeignKey, Integer, Sequence, Table, UniqueConstraint, func
 
 from facades_api.db import metadata
 
 
-class MarksTable(Table):
-    """
-    An attempt to annotate marks columns.
-    """
-
-    __annotations__ = Table.__annotations__ | {
-        "c": NamedTuple(
-            "MarksColumns",
-            [
-                ("id", int),
-                ("photo_id", int),
-                ("user_id", int),
-                ("parent_id", int),
-                ("added_at", datetime),
-                ("rating", int),
-                ("complaints", int),
-            ],
-        )
-    }
-
-
 marks_id_seq = Sequence("marks_id_seq")
 
-
-marks = MarksTable(
+marks = Table(
     "marks",
     metadata,
     Column("id", Integer, marks_id_seq, server_default=marks_id_seq.next_value(), primary_key=True),
     Column("photo_id", Integer, ForeignKey("photos.id"), nullable=False),
     Column("user_id", Integer, ForeignKey("users.id"), nullable=False),
     Column("parent_id", Integer, ForeignKey("marks.id")),
-    Column("added_at", TIMESTAMP(timezone=True), nullable=False, server_default=func.now()),
+    Column(
+        "added_at", TIMESTAMP(timezone=True), nullable=False, server_default=func.now()  # pylint: disable=not-callable
+    ),
     Column("rating", Integer, nullable=False, default=0),
     Column("complaints", Integer, nullable=False, default=0),
     UniqueConstraint("photo_id", "user_id", "parent_id", name="marks_unique_photo_id_user_id"),
 )
+"""
+Marks (groups of defects).
+
+Columns:
+- `id` - mark identifier, int serial
+- `photo_id` - photo identifier, int
+- `user_id` - identifier of the user who created the mark, int
+- `parent_id` - identifier of a mark used as starting point in marking, int
+- `added_at` - datetime of a mark creation, timestamptz
+- `rating` - sum of feedbacks left by other users, int
+- `complaints` - number of complaints left by other user on a mark, int
+"""

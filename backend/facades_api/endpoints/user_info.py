@@ -2,17 +2,17 @@
 """
 User info endpoint is defined here.
 """
-from fastapi import APIRouter, Depends
+from fastapi import Depends
 from starlette import status
 
 from facades_api.dto import User as UserDTO
 from facades_api.schemas import UserInfoResponse
 from facades_api.utils.dependencies import user_dependency
 
-api_router = APIRouter(tags=["User data"])
+from .routers import user_data_router
 
 
-@api_router.get(
+@user_data_router.get(
     "/user_info",
     status_code=status.HTTP_200_OK,
     response_model=UserInfoResponse,

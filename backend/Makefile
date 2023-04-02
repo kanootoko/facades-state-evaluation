@@ -1,7 +1,10 @@
-VERSION = 0.4.1
+VERSION = 0.5.0
 
 lint:
-	pylint facades_api --max-line-length 120
+	python -m pylint facades_api
+
+format:
+	python -m black facades_api
 
 run:
 	python -m facades_api

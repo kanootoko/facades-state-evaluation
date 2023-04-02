@@ -16,7 +16,9 @@ async def update_evaluation_value(conn: AsyncConnection, building_id: int) -> No
     """
     Recalculate building evaluation in the database.
     """
-    statement = select(func.count(photos.c.id)).where(photos.c.building_id == building_id)
+    statement = select(func.count(photos.c.id)).where(  # pylint: disable=not-callable
+        photos.c.building_id == building_id
+    )
     if (await conn.execute(statement)).scalar() == 0:
         logger.warning("evaluation update requested for building {} without photos", building_id)
     building_photos = select(photos).where(photos.c.building_id == building_id).subquery("building_photos")

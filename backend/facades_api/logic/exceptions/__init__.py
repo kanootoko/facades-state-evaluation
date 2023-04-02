@@ -14,17 +14,3 @@ from facades_api.logic.exceptions.users import (
     UserNotActiveError,
     UserNotFoundError,
 )
-
-__all__ = [
-    "TooManyBuildingsError",
-    "DefectsClassificationError",
-    "FileSizeError",
-    "AccessTokenUsedToRefreshError",
-    "AccessTokenExpiredError",
-    "RefreshTokenExpiredError",
-    "RefreshTokenNotFoundError",
-    "UserCredentialsInvalidError",
-    "UserExistsError",
-    "UserNotActiveError",
-    "UserNotFoundError",
-]

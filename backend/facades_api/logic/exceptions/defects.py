@@ -11,7 +11,10 @@ class DefectsClassificationError(FacadesApiError):
     Thrown on defects classification fail.
     """
 
-    def status_code(self) -> int:
+    def get_status_code(self) -> int:
+        """
+        Return 400 Bad Request http code.
+        """
         return status.HTTP_400_BAD_REQUEST
 
     def __str__(self) -> str:

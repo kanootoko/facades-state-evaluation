@@ -2,29 +2,26 @@
 """
 Login (authorization) endpoint is defined here.
 """
-from fastapi import APIRouter, Depends
+from fastapi import Depends
 from fastapi.security import OAuth2PasswordRequestForm
 from sqlalchemy.ext.asyncio import AsyncConnection
 from starlette import status
 
 from facades_api.db.connection import get_connection
-from facades_api.logic import authorize, refresh_tokens as refresh
+from facades_api.logic import authorize
+from facades_api.logic import refresh_tokens as refresh
 from facades_api.schemas import LoginResponse
 from facades_api.utils import Token
 
-api_router = APIRouter(tags=["User data"])
+from .routers import user_data_router
 
 
-@api_router.post(
-    "/login",
-    status_code=status.HTTP_200_OK,
-    response_model=LoginResponse,
-)
+@user_data_router.post("/login", status_code=status.HTTP_200_OK)
 async def authorize_user(
     device: str = "default",
     form_data: OAuth2PasswordRequestForm = Depends(),
     conn: AsyncConnection = Depends(get_connection),
-):
+) -> LoginResponse:
     """
     Authorizes user by given username (email or name) and password if user exists and active.
     Return access and refresh tokens, which user would need to store and send
@@ -35,15 +32,11 @@ async def authorize_user(
     return LoginResponse(access_token=tokens.access, refresh_token=tokens.refresh)
 
 
-@api_router.post(
-    "/refresh_tokens",
-    status_code=status.HTTP_200_OK,
-    response_model=LoginResponse,
-)
+@user_data_router.post("/refresh_tokens", status_code=status.HTTP_200_OK)
 async def refresh_tokens(
     refresh_token: str,
     conn: AsyncConnection = Depends(get_connection),
-):
+) -> LoginResponse:
     """
     Return access and refresh tokens for a given refresh token if it is valid and user is active.
     Returns access and refresh tokens, which user would need to store and send

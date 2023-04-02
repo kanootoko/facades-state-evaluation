@@ -19,7 +19,7 @@ from facades_api import __version__
 from facades_api.config import AppSettings
 from facades_api.config.app_settings_global import app_settings
 from facades_api.db.connection.session import SessionManager
-from facades_api.endpoints import list_of_routes
+from facades_api.endpoints import list_of_routers
 
 LAST_UPDATE = "2023-01-15"
 
@@ -28,7 +28,7 @@ def bind_routes(application: FastAPI, prefix: str) -> None:
     """
     Bind all routes to application.
     """
-    for route in list_of_routes:
+    for route in list_of_routers:
         application.include_router(route, prefix=(prefix if "/" not in {r.path for r in route.routes} else ""))
 
 

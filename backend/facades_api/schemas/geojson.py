@@ -8,8 +8,10 @@ from typing import Any, Iterable
 
 import pandas as pd
 from loguru import logger
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 from sqlalchemy.engine.row import Row
+
+from facades_api.dto.geojson import FeatureDto, GeoJSONDto, GeometryDto, CrsDto
 
 
 class Crs(BaseModel):
@@ -32,6 +34,13 @@ class Crs(BaseModel):
             logger.debug("Crs {} code is invalid? {!r}", self, exc)
             raise ValueError(f"something wrong with crs name: '{name}'") from exc
 
+    @classmethod
+    def from_dto(cls, dto: CrsDto) -> "Crs":
+        """
+        Construct from DTO.
+        """
+        return cls(type=dto.type, properties=dto.properties)
+
 
 crs_4326 = Crs(type="name", properties={"name": "urn:ogc:def:crs:EPSG:4326"})
 crs_3857 = Crs(type="name", properties={"name": "urn:ogc:def:crs:EPSG:3857"})
@@ -42,8 +51,18 @@ class Geometry(BaseModel):
     Geometry representation for GeoJSON model.
     """
 
-    type: tp.Literal["Point", "Polygon", "MultiPolygon", "LineString"]
-    coordinates: list[tp.Any]
+    type: tp.Literal["Point", "Polygon", "MultiPolygon", "LineString"] = Field(default="Polygon")
+    coordinates: list[tp.Any] = Field(
+        description="list[int] for Point,\n" "list[list[list[int]]] for Polygon",
+        default=[[[30.22, 59.86], [30.22, 59.85], [30.25, 59.85], [30.25, 59.86], [30.22, 59.86]]],
+    )
+
+    @classmethod
+    def from_dto(cls, dto: GeometryDto) -> "Geometry":
+        """
+        Construct from DTO.
+        """
+        return cls(type=dto.type, coordinates=dto.coordinates)
 
 
 class Feature(BaseModel):
@@ -68,6 +87,13 @@ class Feature(BaseModel):
         if isinstance(geometry, str):
             geometry = json.loads(geometry)
         return cls(geometry=geometry, properties=properties)
+
+    @classmethod
+    def from_dto(cls, dto: FeatureDto) -> "Feature":
+        """
+        Construct from DTO.
+        """
+        return cls(type=dto.type, geometry=Geometry.from_dto(dto.geometry), properties=dto.properties)
 
     @classmethod
     def from_dict(
@@ -144,3 +170,10 @@ class GeoJSONResponse(BaseModel):
             crs=crs,
             features=features,
         )
+
+    @classmethod
+    def from_dto(cls, dto: GeoJSONDto) -> "GeoJSONResponse":
+        """
+        Construct from DTO.
+        """
+        return cls(crs=Crs.from_dto(dto.crs), features=[Feature.from_dto(feature) for feature in dto.features])

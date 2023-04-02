@@ -4,14 +4,14 @@ Defects drawing functions are defined here.
 """
 from PIL import Image, ImageDraw, ImageFont
 
-from facades_api.dto import ClassificationResult
+from facades_api.dto import ClassificationResultDto
 
 default_color = (60, 60, 60, 120)
 
 
 def draw_defects(
     photo: Image.Image,
-    defects: list[ClassificationResult],
+    defects: list[ClassificationResultDto],
     colors: dict[str, tuple[int, int, int, int]] = {
         "bricks": (180, 10, 10, 60),
         "wall_damage": (250, 128, 40, 60),

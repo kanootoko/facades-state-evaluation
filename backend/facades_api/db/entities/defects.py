@@ -2,39 +2,14 @@
 """
 Defects database table is defined here.
 """
-from typing import NamedTuple
-
 from sqlalchemy import Column, Float, ForeignKey, Integer, Sequence, Table
 
 from facades_api.db import metadata
 
 
-class DefectsTable(Table):
-    """
-    An attempt to annotate defects columns.
-    """
-
-    __annotations__ = Table.__annotations__ | {
-        "c": NamedTuple(
-            "DefectsColumns",
-            [
-                ("id", int),
-                ("mark_id", int),
-                ("author_id", int),
-                ("x", float),
-                ("y", float),
-                ("width", float),
-                ("height", float),
-                ("type_id", int),
-            ],
-        )
-    }
-
-
 defects_id_seq = Sequence("defects_id_seq")
 
-
-defects = DefectsTable(
+defects = Table(
     "defects",
     metadata,
     Column("id", Integer, defects_id_seq, server_default=defects_id_seq.next_value(), primary_key=True),
@@ -46,3 +21,16 @@ defects = DefectsTable(
     Column("height", Float, nullable=False),
     Column("type_id", Integer, ForeignKey("defect_types.id"), nullable=False),
 )
+"""
+Facades defects.
+
+Columns:
+- `id` - defect identifier, int serial
+- `mark_id` - mark (deffects group) identifier, int
+- `author_id` - identifier of the user who marked the deffect, int
+- `x` - horizontal relative coordinate of start of a deffect on a photo, from 0.0 to 1.0, float
+- `y` - vertical relative coordinate of startof a deffect on a photo, from 0.0 to 1.0, float
+- `width` - horizontal relative length of a deffect on a photo, from 0.0 to 1.0, float
+- `y` - verticalrelative length of a deffect on a photo, from 0.0 to 1.0, float
+- `type_id` - feccrect type identifier, int
+"""

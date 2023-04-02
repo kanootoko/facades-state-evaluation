@@ -16,7 +16,10 @@ class UserExistsError(FacadesApiError):
         self.email = email
         self.name = name
 
-    def status_code(self) -> int:
+    def get_status_code(self) -> int:
+        """
+        Return 400 Bad Request http code.
+        """
         return status.HTTP_400_BAD_REQUEST
 
     def __str__(self) -> str:
@@ -33,7 +36,10 @@ class UserNotFoundError(FacadesApiError):
         self.email = email
         self.name = name
 
-    def status_code(self) -> int:
+    def get_status_code(self) -> int:
+        """
+        Return 401 Unauthorized response code.
+        """
         return status.HTTP_401_UNAUTHORIZED
 
     def __str__(self) -> str:
@@ -49,7 +55,10 @@ class UserCredentialsInvalidError(FacadesApiError):
         super().__init__()
         self.login = login
 
-    def status_code(self) -> int:
+    def get_status_code(self) -> int:
+        """
+        Return 401 Unauthorized response code.
+        """
         return status.HTTP_401_UNAUTHORIZED
 
     def __str__(self) -> str:
@@ -65,7 +74,10 @@ class UserNotActiveError(FacadesApiError):
         super().__init__()
         self.login = login
 
-    def status_code(self) -> int:
+    def get_status_code(self) -> int:
+        """
+        Return 401 Unauthorized response code.
+        """
         return status.HTTP_401_UNAUTHORIZED
 
     def __str__(self) -> str:
@@ -81,7 +93,10 @@ class AccessTokenExpiredError(FacadesApiError):
         super().__init__()
         self.access_token = access_token
 
-    def status_code(self) -> int:
+    def get_status_code(self) -> int:
+        """
+        Return 401 Unauthorized response code.
+        """
         return status.HTTP_401_UNAUTHORIZED
 
     def __str__(self) -> str:
@@ -97,7 +112,10 @@ class RefreshTokenNotFoundError(FacadesApiError):
         super().__init__()
         self.refresh_token = refresh_token
 
-    def status_code(self) -> int:
+    def get_status_code(self) -> int:
+        """
+        Return 401 Unauthorized response code.
+        """
         return status.HTTP_401_UNAUTHORIZED
 
     def __str__(self) -> str:
@@ -113,7 +131,10 @@ class RefreshTokenExpiredError(FacadesApiError):
         super().__init__()
         self.refresh_token = refresh_token
 
-    def status_code(self) -> int:
+    def get_status_code(self) -> int:
+        """
+        Return 401 Unauthorized response code.
+        """
         return status.HTTP_401_UNAUTHORIZED
 
     def __str__(self) -> str:
@@ -129,7 +150,10 @@ class AccessTokenUsedToRefreshError(FacadesApiError):
         super().__init__()
         self.token = token
 
-    def status_code(self) -> int:
+    def get_status_code(self) -> int:
+        """
+        Return 400 Bad Request http code.
+        """
         return status.HTTP_400_BAD_REQUEST
 
     def __str__(self) -> str:

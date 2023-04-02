@@ -10,16 +10,3 @@ from .marks import marks
 from .photos import photos
 from .users import users
 from .users_auth import users_auth
-
-__all__ = [
-    "buildings",
-    "defect_types",
-    "defects",
-    "MFEnum",
-    "PTEnum",
-    "mark_feedback",
-    "marks",
-    "photos",
-    "users_auth",
-    "users",
-]

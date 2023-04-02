@@ -4,38 +4,14 @@ Users Authentication database table is defined here.
 
 It stores access tokens data
 """
-from datetime import datetime
-from typing import NamedTuple
-
 from sqlalchemy import TIMESTAMP, Boolean, Column, ForeignKey, Integer, Sequence, String, Table, UniqueConstraint
 
 from facades_api.db import metadata
 
 
-class UsersAuthTable(Table):
-    """
-    An attempt to annotate users_auth columns.
-    """
-
-    __annotations__ = Table.__annotations__ | {
-        "c": NamedTuple(
-            "UsersAuthColumns",
-            [
-                ("id", int),
-                ("user_id", int),
-                ("device", str),
-                ("is_active", bool),
-                ("refresh_until", datetime),
-                ("valid_until", datetime),
-            ],
-        )
-    }
-
-
 users_auth_id_seq = Sequence("users_auth_id_seq")
 
-
-users_auth = UsersAuthTable(
+users_auth = Table(
     "users_auth",
     metadata,
     Column("id", Integer, users_auth_id_seq, server_default=users_auth_id_seq.next_value(), primary_key=True),
@@ -46,3 +22,14 @@ users_auth = UsersAuthTable(
     Column("valid_until", TIMESTAMP(timezone=True), nullable=False),
     UniqueConstraint("user_id", "device", name="users_auth_unique_user_id_device"),
 )
+"""
+Users authentications which is used to maintain access and refresh tokens.
+
+Columns:
+- `id` - user_auth identifier, int serial
+- `user_id` - identifier of the user, integer
+- `device` - user device name used for refreshing token, varchar(200)
+- `is_active` - indicates whether device token is deactivated even if it is still vaild by time, boolean
+- `refresh_until` - datetime of a last moment by which refresh token is valid, timestamptz
+- `valid_until` - datetime of a last moment by which access token is valid, timestamptz
+"""

@@ -1,8 +1,8 @@
 # pylint: disable=missing-module-docstring, no-name-in-module, too-few-public-methods, duplicate-code
 """
-Alternative geojson response model and its inner parts are defined here.
+More lightweight geojson response model and its inner parts are defined here.
 
-It is a bit faster to initaliza `dataclass`es instead of a `pydantic` ones,
+It is a bit faster to initalize dataclasses instead of a pydantic classes,
     but still too long for >40k features in GeoJSON.
 """
 import json
@@ -16,7 +16,7 @@ from sqlalchemy.engine.row import Row
 
 
 @dataclass
-class Crs:
+class CrsDto:
     """
     Projection SRID / CRS representation for GeoJSON model as a dataclass.
     """
@@ -37,12 +37,12 @@ class Crs:
             raise ValueError(f"something wrong with crs name: '{name}'") from exc
 
 
-crs_4326 = Crs("name", {"name": "urn:ogc:def:crs:EPSG:4326"})
-crs_3857 = Crs("name", {"name": "urn:ogc:def:crs:EPSG:3857"})
+crs_4326 = CrsDto("name", {"name": "urn:ogc:def:crs:EPSG:4326"})
+crs_3857 = CrsDto("name", {"name": "urn:ogc:def:crs:EPSG:3857"})
 
 
 @dataclass(frozen=True)
-class Geometry:
+class GeometryDto:
     """
     Geometry representation for GeoJSON model as a dataclass.
     """
@@ -52,12 +52,12 @@ class Geometry:
 
 
 @dataclass
-class Feature:
+class FeatureDto:
     """
     Feature representation for GeoJSON model as a dataclass.
     """
 
-    geometry: Geometry
+    geometry: GeometryDto
     properties: dict[str, tp.Any] = field(default_factory=dict)
     type: tp.Literal["Feature"] = "Feature"
 
@@ -78,7 +78,7 @@ class Feature:
     @classmethod
     def from_dict(
         cls, feature: dict[str, Any], geometry_column: str = "geometry", include_nulls: bool = True
-    ) -> "Feature":
+    ) -> "FeatureDto":
         """
         Construct Feature object from dictionary with a given geometrty field.
         """
@@ -109,24 +109,28 @@ class Feature:
 
 
 @dataclass
-class GeoJSONResponse:
+class GeoJSONDto:
     """
-    GeoJSON model representation.
+    GeoJSON model representation as a dataclass.
     """
 
-    crs: Crs
-    features: list[Feature]
+    crs: CrsDto
+    features: list[FeatureDto]
     type: tp.Literal["FeatureCollection"] = "FeatureCollection"
 
     @classmethod
     async def from_df(
-        cls, data_df: pd.DataFrame, geometry_column: str = "geometry", crs: Crs = crs_4326, include_nulls: bool = True
-    ) -> "GeoJSONResponse":
+        cls,
+        data_df: pd.DataFrame,
+        geometry_column: str = "geometry",
+        crs: CrsDto = crs_4326,
+        include_nulls: bool = True,
+    ) -> "GeoJSONDto":
         """
         Construct GeoJSON model from pandas DataFrame with one column containing GeoJSON geometries.
         """
         return cls(
-            crs, list(data_df.apply(lambda row: Feature.from_series(row, geometry_column, include_nulls), axis=1))
+            crs, list(data_df.apply(lambda row: FeatureDto.from_series(row, geometry_column, include_nulls), axis=1))
         )
 
     @classmethod
@@ -134,15 +138,15 @@ class GeoJSONResponse:
         cls,
         features: Iterable[dict[str, Any]],
         geometry_field: str = "geometry",
-        crs: Crs = crs_4326,
+        crs: CrsDto = crs_4326,
         include_nulls: bool = True,
-    ) -> "GeoJSONResponse":
+    ) -> "GeoJSONDto":
         """
-        Construct GeoJSON model from list of dictionaries or SQLAlchemy Row classes from the database,
+        Construct GeoJSON DTO from list of dictionaries or SQLAlchemy Row classes from the database,
             with one field in each containing GeoJSON geometries.
         """
 
-        func = Feature.from_row if isinstance(next(iter(features), None), Row) else Feature.from_dict
+        func = FeatureDto.from_row if isinstance(next(iter(features), None), Row) else FeatureDto.from_dict
         features = [func(feature, geometry_field, include_nulls) for feature in features]
         return cls(
             crs=crs,

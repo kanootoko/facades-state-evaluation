@@ -1,4 +1,3 @@
-# pylint: disable=invalid-name
 """
 User DTO is defined here.
 """
@@ -12,7 +11,7 @@ class User:
     Full User model, but without password_hash.
     """
 
-    id: int
+    id: int  # pylint: disable=invalid-name
     email: str
     name: str
     registered_at: datetime

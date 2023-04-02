@@ -5,19 +5,5 @@ from facades_api.logic.authorization import authorize, refresh_tokens
 from facades_api.logic.buildings import get_buildings, get_buildings_in_square
 from facades_api.logic.evaluation import update_evaluation_value
 from facades_api.logic.registration import register
-from facades_api.logic.upload_photo import classify_defects, save_classification_results, save_photo
+from facades_api.logic.photos import classify_defects, save_classification_results, save_photo
 from facades_api.logic.user_info import get_user_info, validate_user_token
-
-__all__ = [
-    "authorize",
-    "refresh_tokens",
-    "get_buildings",
-    "get_buildings_in_square",
-    "update_evaluation_value",
-    "register",
-    "get_user_info",
-    "classify_defects",
-    "save_classification_results",
-    "save_photo",
-    "validate_user_token",
-]

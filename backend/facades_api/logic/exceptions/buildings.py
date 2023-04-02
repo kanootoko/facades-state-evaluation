@@ -16,7 +16,10 @@ class TooManyBuildingsError(FacadesApiError):
         self.buildings = buildings
         self.maximum_buildings = maximum_buildings
 
-    def status_code(self) -> int:
+    def get_status_code(self) -> int:
+        """
+        Return 400 Bad Request response code.
+        """
         return status.HTTP_400_BAD_REQUEST
 
     def __str__(self) -> str:

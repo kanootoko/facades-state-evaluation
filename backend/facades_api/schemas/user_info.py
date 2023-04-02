@@ -1,4 +1,4 @@
-# pylint: disable=no-name-in-module, too-few-public-methods
+# pylint: disable=no-name-in-module,too-few-public-methods
 """
 User info response is defined here.
 """
