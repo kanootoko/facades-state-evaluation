@@ -1,0 +1,22 @@
+version: '3.1'
+
+services:
+  nginx:
+    build:
+      context: .
+      dockerfile: nginx.Dockerfile
+    ports:
+      - 80:80
+      - 443:443
+    volumes:
+      - hosting_ssl:/ssl
+    networks:
+      - hosting_net
+
+networks:
+  hosting_net:
+    external: true
+
+volumes:
+  hosting_ssl:
+    external: true

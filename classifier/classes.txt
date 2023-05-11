@@ -1,4 +1,0 @@
-bricks
-wall_damage
-crack
-construction

@@ -36,8 +36,8 @@ def draw_defects(
             (
                 defect.box[0] * photo.width,
                 defect.box[1] * photo.height,
-                (defect.box[0] + defect.box[2]) * photo.width,
-                (defect.box[1] + defect.box[3]) * photo.height,
+                defect.box[2] * photo.width,
+                defect.box[3] * photo.height,
             ),
             fill=colors.get(defect.class_name),
         )

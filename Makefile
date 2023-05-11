@@ -3,4 +3,5 @@ env:
 	cp backend/.env.example backend/.env
 	cp hosting/.env.example hosting/.env
 	cp classifier/.env.example classifier/.env
-	echo "Edit variables in .env-files (here, in backend, hosting and classifier) as you need"
+	cp db.env.example db.env
+	echo "Edit variables in .env-files (.env, db.env, backend/.env, hosting/.env and classifier/.env) as you need"

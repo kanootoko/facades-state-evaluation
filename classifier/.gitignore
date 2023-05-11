@@ -1,2 +1,8 @@
 *.weights
 *.cfg
+/yolov7
+/venv
+__pycache__
+/models/*
+/training/*.pt
+/training/dataset

@@ -1,5 +1,4 @@
 click
 flask
 numpy
-opencv-python
-gunicorn
+Pillow

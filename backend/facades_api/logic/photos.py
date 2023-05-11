@@ -37,11 +37,13 @@ async def save_photo(
     return photo_id, path.read_bytes()
 
 
-async def classify_defects(photo: bytes) -> list[ClassificationResultDto]:
+async def classify_defects(photo: bytes, confidence_threshold: float = 0.75) -> list[ClassificationResultDto]:
     """
     Create a request to classification service and get a list of defects.
     """
-    response = requests.post(app_settings.classifier_endpoint, data=photo, timeout=60)
+    response = requests.post(
+        app_settings.classifier_endpoint, params={"confidence_threshold": confidence_threshold}, data=photo, timeout=60
+    )
     if response.status_code != 200 or "defects" not in (response_data := response.json()):
         raise DefectsClassificationError()
     return [ClassificationResultDto.from_dict(item) for item in response_data["defects"]]

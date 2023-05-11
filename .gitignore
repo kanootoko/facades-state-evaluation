@@ -1,5 +1,7 @@
 *.bkp
 *.dtmp
-.env
+/*.env
 *.sql
 pg_data
+.vscode
+/export

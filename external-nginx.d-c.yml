@@ -8,6 +8,8 @@ services:
       - ./pg_data:/var/lib/postgresql/data
     env_file: db.env
     restart: unless-stopped
+    networks:
+      - facades
 
   facades_classifier:
     container_name: facades_classifier
@@ -15,6 +17,8 @@ services:
     image: 'facades_classifier:latest'
     env_file: ./classifier/.env
     restart: unless-stopped
+    networks:
+      - facades
 
   facades_backend:
     container_name: facades_backend
@@ -29,26 +33,27 @@ services:
       - facades_db
       - facades_classifier
     restart: unless-stopped
+    networks:
+      - facades
 
   facades_nginx:
     container_name: facades_nginx
     build:
       context: hosting
-      dockerfile: nginx.Dockerfile
+      dockerfile: nginx-http-only.Dockerfile
       args:
-        DOMAIN: ${DOMAIN}
         BACKEND_ADDRESS: ${BACKEND_ADDRESS}
     image: 'facades_nginx:latest'
-    ports:
-      - ${HTTP_PORT}:80
-      - ${HTTPS_PORT}:443
     env_file:
       .env
     volumes:
-      - ./hosting/config/ssl:/ssl
+      - hosting_ssl:/ssl
     depends_on:
       - facades_backend
     restart: unless-stopped
+    networks:
+      - facades
+      - hosting_net
 
   facades_certificate_updater:
     container_name: facades_certificate_updater
@@ -60,7 +65,21 @@ services:
         DOMAIN: ${DOMAIN}
     image: 'facades_cetrificates_updater:latest'
     volumes:
-      - ./hosting/config/ssl:/ssl
-      - ./hosting/config/letsencryptl:/etc/letsencrypt
+      - hosting_ssl:/ssl
+      - hosting_letsencrypt:/etc/letsencrypt
     depends_on:
       - facades_nginx
+    restart: unless-stopped
+    networks:
+      - facades
+
+networks:
+  facades:
+  hosting_net:
+    external: true
+
+volumes:
+  hosting_ssl:
+    external: true
+  hosting_letsencrypt:
+    external: true

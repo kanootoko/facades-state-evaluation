@@ -26,3 +26,28 @@ Then run `docker compose -f certbot-run-once.d-c.yml --rm` to generate certifica
 
 After ssl certificate is generated and stored in `ssl` directory, one can run `docker compose up nginx.conf`
   to start proxy services in both http and https modes.
+
+## Using external Nginx with subdomains
+
+Another possible solution is to configure an outer nginx to proxy all requests from domain/subdomain to facades Nginx.
+  Certificates must be used by the outer Nginx, so the best solution is to run it inside the Docker itself, but in
+  the different network. Same applies to other services.
+  
+The workflow is following:
+
+- create network `hosting_net` and volumes `facades_ssl` and `facades_letsencrypt`
+- change `nginx.conf` by setting your domain and other services if needed
+- get certificates for facades service and your other services:
+  - run docker-compose for file `with_external_nginx/nginx-http-only.c-c.yml`
+  - run docker-compose for file `with_external_nginx/certbot-run-once.d-c.yml` with set DOMAIN and EMAIL
+    environment variables for a service
+  - (repeat for all your services)
+  - stop nginx-http-only docker-compose and remove its resources among with certbot-run-once
+- run docker-compose for file external-nginx.d-c.yml in the root of the project
+
+To add more services to this configuration, you will need to:
+
+1. Add service subdomain and proxy path inside the `hosting_net` docker network to with_external_nginx/nginx.conf
+2. Add a mock service with the same name to with_external_nginx/certbot-run-once.d-c.yml
+3. Run docker-compose file with_external_nginx/certbot-run-once.d-c.yml for the service
+4. Rebuild and restart nginx.d-c.yml

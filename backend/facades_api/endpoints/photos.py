@@ -54,7 +54,7 @@ async def upload_photo(
     status_code=status.HTTP_200_OK,
     responses={status.HTTP_200_OK: {"content": {"image/jpg": {}}}},
 )
-async def classify_photo(angle_type: PTEnum, photo_file: UploadFile = File(...)):
+async def classify_photo(angle_type: PTEnum, photo_file: UploadFile = File(...), confidence_threshold: float = 0.75):
     """
     Pass given photo directly to the classifier service and get an image with marked defects.
     """
@@ -62,7 +62,7 @@ async def classify_photo(angle_type: PTEnum, photo_file: UploadFile = File(...))
     photo = await photo_file.read(20 << 20)
     if not (600 << 10) <= len(photo) < (20 << 20):  # 600kb .. 20mb
         raise FileSizeError(len(photo))
-    classification_results = await classify_defects(photo)
+    classification_results = await classify_defects(photo, confidence_threshold)
     logger.debug("classified {} defects", len(classification_results))
     buf = io.BytesIO(photo)
     image = draw_defects(Image.open(buf), classification_results)

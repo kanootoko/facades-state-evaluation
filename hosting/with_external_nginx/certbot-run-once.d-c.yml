@@ -9,6 +9,12 @@ services:
         EMAIL: $EMAIL
         DOMAIN: $DOMAIN
     volumes:
-      - ./config/ssl:/ssl
-      - ./config/letsencryptl:/etc/letsencrypt
+      - hosting_ssl:/ssl
+      - hosting_letsencrypt:/etc/letsencrypt
     command: ["/run_once"]
+
+volumes:
+  hosting_ssl:
+    external: true
+  hosting_letsencrypt:
+    external: true
